@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرشد سياحي | Tour Guide</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f5f6fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-top: -50px;
+            position: relative;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .results-section {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .country-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        .country-card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--light-bg);
+            padding-bottom: 0.5rem;
+        }
+
+        .info-group {
+            margin-bottom: 1rem;
+        }
+
+        .info-group h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .temp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .temp-table th, .temp-table td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .temp-table th {
+            background-color: var(--light-bg);
+        }
+
+        .tips-list {
+            list-style-position: inside;
+            padding-right: 1rem;
+        }
+
+        .tips-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .search-section {
+                margin-top: -30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>مرشد سياحي | Tour Guide</h1>
+        <p>خطط رحلتك بسهولة مع أفضل النصائح والأماكن السياحية</p>
+    </header>
+
+    <div class="container">
+        <section class="search-section">
+            <form id="travel-form">
+                <div class="form-group">
+                    <label for="destination">الوجهة السياحية</label>
+                    <select id="destination" required>
+                        <option value="">اختر الوجهة</option>
+                    </select>
+                </div>
+                <button type="submit">عرض معلومات الوجهة</button>
+            </form>
+        </section>
+
+        <section class="results-section" id="results">
+            <!-- ستظهر النتائج هنا -->
+        </section>
+    </div>
+
+    <script>
+        // بيانات الدول
+        const countriesData = [
+            // تم تضمين البيانات هنا للتبسيط
+            {"country":{"en":"France","ar":"فرنسا"},"capital":{"en":"Paris","ar":"باريس"},"language":{"en":"French","ar":"الفرنسية"},"currency":{"en":"Euro","ar":"يورو"},"top_attractions":{"en":["Eiffel Tower","Louvre Museum","Versailles Palace"],"ar":["برج إيفل","متحف اللوفر","قصر فرساي"]},"temperature":{"spring":{"en":"15-20°C","ar":"15-20°م"},"summer":{"en":"25-30°C","ar":"25-30°م"},"autumn":{"en":"10-15°C","ar":"10-15°م"},"winter":{"en":"0-5°C","ar":"0-5°م"}},"best_time_to_visit":{"en":"Spring and Fall","ar":"الربيع والخريف"},"travel_tips":{"en":["Book tickets for major attractions in advance.","Use public transport to save money.","Learn a few basic French phrases."],"ar":["احجز تذاكر المعالم الرئيسية مسبقاً.","استخدم وسائل النقل العام لتوفير المال.","تعلم بعض العبارات الفرنسية الأساسية."]}},
+            // ... باقي البيانات
+        ];
+
+        // تهيئة قائمة الوجهات
+        const destinationSelect = document.getElementById('destination');
+        countriesData.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country.country.en;
+            option.textContent = country.country.ar;
+            destinationSelect.appendChild(option);
+        });
+
+        // معالجة تقديم النموذج
+        document.getElementById('travel-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const selectedCountry = document.getElementById('destination').value;
+            const countryData = countriesData.find(c => c.country.en === selectedCountry);
+            
+            if (countryData) {
+                displayCountryInfo(countryData);
+            }
+        });
+
+        // عرض معلومات الدولة
+        function displayCountryInfo(country) {
+            const resultsSection = document.getElementById('results');
+            resultsSection.innerHTML = `
+                <div class="country-card">
+                    <h3>${country.country.ar}</h3>
+                    
+                    <div class="info-group">
+                        <h4>معلومات أساسية</h4>
+                        <p>العاصمة: ${country.capital.ar}</p>
+                        <p>اللغة: ${country.language.ar}</p>
+                        <p>العملة: ${country.currency.ar}</p>
+                    </div>
+
+                    <div class="info-group">
+                        <h4>أفضل وقت للزيارة</h4>
+                        <p>${country.best_time_to_visit.ar}</p>
+                    </div>
+
+                    <div class="info-group">
+                        <h4>درجات الحرارة</h4>
+                        <table class="temp-table">
+                            <tr>
+                                <th>الفصل</th>
+                                <th>درجة الحرارة</th>
+                            </tr>
+                            <tr>
+                                <td>الربيع</td>
+                                <td>${country.temperature.spring.ar}</td>
+                            </tr>
+                            <tr>
+                                <td>الصيف</td>
+                                <td>${country.temperature.summer.ar}</td>
+                            </tr>
+                            <tr>
+                                <td>الخريف</td>
+                                <td>${country.temperature.autumn.ar}</td>
+                            </tr>
+                            <tr>
+                                <td>الشتاء</td>
+                                <td>${country.temperature.winter.ar}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="info-group">
+                        <h4>أهم المعالم السياحية</h4>
+                        <ul class="tips-list">
+                            ${country.top_attractions.ar.map(attraction => `<li>${attraction}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="info-group">
+                        <h4>نصائح السفر</h4>
+                        <ul class="tips-list">
+                            ${country.travel_tips.ar.map(tip => `<li>${tip}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
